@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>bet-module</display-name>
+	
+	<listener>
+		<description>Spring contextloader</description>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<filter>
+	    <filter-name>javamelody</filter-name>
+	    <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
+	    <async-supported>true</async-supported>
+	</filter>
+	<filter-mapping>
+	    <filter-name>javamelody</filter-name>
+	    <url-pattern>/*</url-pattern>
+	    <dispatcher>REQUEST</dispatcher>
+	    <dispatcher>ASYNC</dispatcher>
+	</filter-mapping>
+	<listener>
+	    <listener-class>net.bull.javamelody.SessionListener</listener-class>
+	</listener>	
+	<servlet>
+		<servlet-name>rest-controller</servlet-name>
+		<servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+		<init-param>
+			<param-name>com.sun.jersey.config.property.packages</param-name>
+			<param-value>resources</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>rest-controller</servlet-name>
+		<url-pattern>/service/*</url-pattern>
+	</servlet-mapping>
+</web-app>
