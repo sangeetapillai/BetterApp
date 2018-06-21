@@ -15,6 +15,47 @@ public class Match {
 	private String team2Name;
 	private String matchTime;
 	private long bounty;
+	private String winner;
+	private boolean voted;
+	private String votedFor;
+	
+	public String getVotedFor() {
+		return votedFor;
+	}
+	public void setVotedFor(String votedFor) {
+		this.votedFor = votedFor;
+	}
+
+	// adding for getusertrackrecord api
+	private String resultOfUser;
+	private float userPointsEarned;
+	
+	public boolean isVoted() {
+		return voted;
+	}
+	public void setVoted(boolean voted) {
+		this.voted = voted;
+	}
+	public String getWinner() {
+		return winner;
+	}
+	public void setWinner(String winner) {
+		this.winner = winner;
+	}
+	public String getResultOfUser() {
+		return resultOfUser;
+	}
+	public void setResultOfUser(String resultOfUser) {
+		this.resultOfUser = resultOfUser;
+	}
+	
+	public float getUserPointsEarned() {
+		return userPointsEarned;
+	}
+	public void setUserPointsEarned(float userPointsEarned) {
+		this.userPointsEarned = userPointsEarned;
+	}
+
 	private long creditToPlay;
 	public long getBounty() {
 		return bounty;

@@ -11,7 +11,21 @@ public class User {
 	private int matchesWon;
 	private int matchesLost;
 	private int matchesNotPredicted;
+	private String prediction;
+	private String predictionTime;
 	
+	public String getPredictionTime() {
+		return predictionTime;
+	}
+	public void setPredictionTime(String predictionTime) {
+		this.predictionTime = predictionTime;
+	}
+	public String getPrediction() {
+		return prediction;
+	}
+	public void setPrediction(String prediction) {
+		this.prediction = prediction;
+	}
 	public int getMatchesWon() {
 		return matchesWon;
 	}

@@ -5,9 +5,11 @@ import java.util.List;
 
 import beans.Match;
 import beans.MatchResponse;
+import beans.PostResponse;
+import beans.Prediction;
+import beans.User;
 import beans.UserResponse;
 import daos.MatchDao;
-import beans.User;
 import daos.UserDao;
 import utils.StatusCode;
 
@@ -21,8 +23,8 @@ public class BetService {
 		this.userDao = userDao;
 	}
 	
-	public MatchResponse getAllUpcomingMatches(){
-		List<Match> matchList =  matchDao.getAllUpcomingMatches();
+	public MatchResponse getAllUpcomingMatches(String userEmail) {
+		List<Match> matchList =  matchDao.getAllUpcomingMatches(userEmail);
 		MatchResponse response = new MatchResponse();
 		response.setStatusCode(StatusCode.FAILURE.getValue());
 		response.setMatches(matchList);
@@ -55,5 +57,35 @@ public class BetService {
 			response.setStatusCode(StatusCode.SUCCESS.getValue());
 		}
 		return response;
+	}
+	
+	public PostResponse vote(Prediction[] predictions){
+		PostResponse pr = new PostResponse();
+		pr.setStatusCode(StatusCode.FAILURE.getValue());		
+		if (userDao.vote(predictions)){
+			pr.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return pr;
+	}
+	
+	public MatchResponse getUserTrackRecord(String userEmail) {
+		MatchResponse res = new MatchResponse();
+		res.setStatusCode(StatusCode.FAILURE.getValue());
+		res.setMatches(matchDao.getUserTrackRecord(userEmail));
+		if(res.getMatches() != null)
+		{
+			res.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return res;
+	}
+	
+	public PostResponse getAllPredictionsForMatch(int matchId){
+		UserResponse users = new UserResponse();
+		users.setStatusCode(StatusCode.FAILURE.getValue());
+		users.setUsers(userDao.getAllPredictionsForMatch(matchId));
+		if(users.getUsers() != null){
+			users.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return users;
 	}
 }

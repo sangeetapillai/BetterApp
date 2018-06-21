@@ -7,11 +7,12 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+  
   <context:component-scan base-package="resources" />  
   
   <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" c:dataSource-ref="pgDataSource" />
   <bean id="pgDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" p:driverClassName="org.postgresql.Driver"
-		p:url="jdbc:postgresql://10.200.13.124:5432/gz_db" p:username="gz_user" p:password="gz_user_123" p:initialSize="0" p:maxActive="10" 
+		p:url="jdbc:postgresql://localhost:5432/gz_db" p:username="gz_user" p:password="gz_user_123" p:initialSize="0" p:maxActive="10" 
 		p:maxWait="-1" p:maxIdle="0" />
 		
   <bean id="betService" class="services.BetService" 

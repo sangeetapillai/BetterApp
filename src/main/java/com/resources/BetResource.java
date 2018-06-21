@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import beans.PostResponse;
+import beans.Prediction;
 import beans.User;
 import services.AuthenticationService;
 import services.BetService;
@@ -37,16 +38,17 @@ public class BetResource{
 	@GET
     @Path("/upcomingMatches")
     @Produces(MediaType.APPLICATION_JSON)
-    public PostResponse getUpcomingMatches() {
-       return betService.getAllUpcomingMatches(); 
+    public PostResponse getUpcomingMatches(@QueryParam("userEmail") String userEmail) {
+       return betService.getAllUpcomingMatches(userEmail);
+		
     }
 	
 	@POST
     @Path("/vote")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String vote(String matchId, String vote) {
-        return null;
+    public PostResponse vote(Prediction[] predictions) {
+        return betService.vote(predictions);
     }
 	
 	@GET
@@ -54,6 +56,15 @@ public class BetResource{
     @Produces(MediaType.APPLICATION_JSON)
     public PostResponse userReportCard(@QueryParam("userEmail") String userEmail) {
        return betService.getUserReportCard(userEmail);
+    }
+	
+	@GET
+    @Path("/dummy")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PostResponse dummy() {
+		PostResponse ps = new PostResponse();
+		ps.setMessage("dummy");
+       return ps;
     }
 	
 
@@ -72,6 +83,22 @@ public class BetResource{
     public PostResponse authenticate(User user) {
         return authenticationService.authenticate(user.getUserEmail(), user.getUserPassword());
     }
+	
+	@POST
+    @Path("/getUserTrackRecord")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public PostResponse getUserTrackRecord(User user) {
+        return betService.getUserTrackRecord(user.getUserEmail());
+    }
+	
+	@GET
+    @Path("/getAllPredictionsForMatch")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PostResponse getAllPredictionsForMatch(@QueryParam("matchId") int matchId) {
+        return betService.getAllPredictionsForMatch(matchId);
+    }
+	
 	
 	
 }
