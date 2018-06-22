@@ -93,11 +93,11 @@ public class UserDao {
 		try{
 			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(queryForUserPoints);        
 	        while (rowSet.next()) {
-	            User user = new User();
-	            user.setUserEmail(rowSet.getString("useremail"));
-	            user.setUserName(rowSet.getString("username"));
-	            user.setUserPoints(rowSet.getFloat("user_points"));
-	            userList.add(user);
+	        	 User user = new User();
+		         user.setUserEmail(rowSet.getString("useremail"));
+		         user.setUserName(rowSet.getString("username"));
+		         user.setUserPoints(rowSet.getFloat("user_points"));
+		         userList.add(user);
 	        }
 	        }catch(DataAccessException exp){
 	        	LOGGER.error(queryForUserPoints);

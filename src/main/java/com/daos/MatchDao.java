@@ -1,7 +1,8 @@
 package daos;
 
-import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,8 @@ public class MatchDao {
 	
 	private final JdbcTemplate jdbcTemplate;	
 	private final Logger LOGGER = Logger.getLogger(MatchDao.class);
-	
+	private final static String WINNER = "WON";
+	private final static String LOSER = "LOSE";
 	public MatchDao(JdbcTemplate jdbcTemplate) {
 		super();
 		this.jdbcTemplate = jdbcTemplate;
@@ -48,9 +50,18 @@ public class MatchDao {
             match.setBounty(rowSet.getLong("match_bounty"));
             match.setCreditToPlay(50);
             String matchTime = rowSet.getString("match_time");
-            Timestamp t =   rowSet.getTimestamp("match_time");
             match.setMatchTime(matchTime);
-            match.setOpenForVote(true);
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date d1 = format.parse(matchTime);            
+			Date d2 = new Date();
+			long diff = d1.getTime() - d2.getTime();
+			long diffHours = diff / (60 * 60 * 1000) % 24;
+			if(diffHours >=1) {
+				match.setOpenForVote(true);
+			}
+			else{
+				match.setOpenForVote(false);
+			}
             if(votes.containsKey(match.getMatchId())){
             	 match.setVoted(true);
             	 match.setVotedFor(votes.get(match.getMatchId()));
@@ -77,17 +88,17 @@ public class MatchDao {
 				+ " on gus.useremail = plv.player_name join match_table mtb on mtb.match_id = plv.match_id "
 				+ " where gus.useremail = ? and mtb.result is not null";
         try{
-		SqlRowSet rowSet = jdbcTemplate.queryForRowSet(queryForMatches,userEmail);        
-        while (rowSet.next()) {
-            Match match = new Match();
-            match.setTeam1Name(rowSet.getString("team1"));
-            match.setTeam2Name(rowSet.getString("team2"));
-            match.setWinner(rowSet.getString("match_result"));
-            String matchTime = rowSet.getString("match_time");
-            match.setMatchTime(matchTime);
-            match.setResultOfUser(rowSet.getString("result"));
-            match.setUserPointsEarned(rowSet.getFloat("points_earned"));            
-            matchList.add(match);
+			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(queryForMatches,userEmail);        
+	        while (rowSet.next()) {
+	        	 Match match = new Match();
+	             match.setTeam1Name(rowSet.getString("team1"));
+	             match.setTeam2Name(rowSet.getString("team2"));
+	             match.setWinner(rowSet.getString("match_result"));
+	             String matchTime = rowSet.getString("match_time");
+	             match.setMatchTime(matchTime);
+	             match.setResultOfUser(rowSet.getString("result"));
+	             match.setUserPointsEarned(rowSet.getFloat("points_earned"));            
+	             matchList.add(match);
         }
         }catch(DataAccessException exp){
         	LOGGER.error(queryForMatches);
@@ -97,4 +108,21 @@ public class MatchDao {
         }
 		return matchList;
 	}
+	
+	
+	/*public static void main (String args[]) throws ParseException{
+		String matchTime = "2018-06-22 17:30:00.0";        
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date d1 = format.parse(matchTime);            
+		Date d2 = new Date();
+		long diff = d1.getTime() - d2.getTime();
+		long diffHours = diff / (60 * 60 * 1000) % 24;
+		System.out.println(d1);
+		System.out.println(d2);
+		System.out.println(d1.getTime());
+		System.out.println(d2.getTime());
+		System.out.println(diff);
+		System.out.println(diffHours);
+		
+	}*/
 }
