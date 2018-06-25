@@ -85,17 +85,19 @@ public class UserDao {
 	public List<User> getAllUserPointsInDesc(){
 		
 		List<User> userList = new ArrayList<User>();
-		String queryForUserPoints = 
+		String queryForUserPoints = "select player_name as useremail,user_points from single_player_view_v2 order by user_points desc";
+		
+	/*	String queryForUserPoints = 
 				"select gus.useremail,gus.username, sum(plv.bounty_won)  as \"user_points\" from player_view plv "
 				 + "join gz_users gus on gus.useremail = plv.useremail "
-				 + "group by 1,2 order by user_points desc";
+				 + "group by 1,2 order by user_points desc";*/
 		
 		try{
 			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(queryForUserPoints);        
 	        while (rowSet.next()) {
 	        	 User user = new User();
 		         user.setUserEmail(rowSet.getString("useremail"));
-		         user.setUserName(rowSet.getString("username"));
+		         user.setUserName(rowSet.getString("useremail"));
 		         user.setUserPoints(rowSet.getFloat("user_points"));
 		         userList.add(user);
 	        }
@@ -118,6 +120,9 @@ public class UserDao {
 		User user = new User();
 	
 		String reportCardQuery = 
+				"select p.player_name,p.wins,p.loss,p.user_points as total_bounty  from single_player_view_v2 p where LOWER(p.player_name) = ?";
+		
+		/*String reportCardQuery = 
 				"select p.player_name,p.wins,p.loss,p.nill_play,p.total_bounty from ("
 				+" select plv.player_name, sum(case when plv.status='WON' then 1 else 0 end) as \"wins\"," 
 				+" sum(case when plv.status='LOSE' then 1 else 0 end) as \"loss\","
@@ -127,7 +132,8 @@ public class UserDao {
 				+" join (select plg.player_name,(select count(mtb.match_id) "
 				+" from match_table mtb where mtb.match_time<now())-count(distinct plg.match_id) as \"nill_play\""
 				+" from player_log plg group by 1) nlp on nlp.player_name = plv.player_name "
-				+" group by plv.player_name,nlp.nill_play,total_bounty) as p where LOWER(p.player_name) = ?";
+				+" group by plv.player_name,nlp.nill_play,total_bounty) as p where LOWER(p.player_name) = ?";*/
+		
 		
 		try{
 			SqlRowSet rowSet  = jdbcTemplate.queryForRowSet(reportCardQuery, userEmail.toLowerCase());
@@ -135,7 +141,6 @@ public class UserDao {
 				user.setUserEmail(rowSet.getString("player_name"));
 				user.setMatchesWon(rowSet.getInt("wins"));
 				user.setMatchesLost(rowSet.getInt("loss"));
-				user.setMatchesNotPredicted(rowSet.getInt("nill_play"));
 				user.setUserPoints(rowSet.getFloat("total_bounty"));
 			}
 	        
@@ -195,6 +200,8 @@ public class UserDao {
 		}
 	
 	public List<User> getAllPredictionsForMatch(int matchId){
+			
+		
 		String predictionQuery = "SELECT inn1.player_name, inn1.match_id, inn1.predicted_result, inn1.predicted_time FROM"
 				+ " ( SELECT player_log.player_name, player_log.match_id, player_log.predicted_result, player_log.predicted_time, "
 				+ " row_number() OVER (PARTITION BY player_log.match_id, player_log.player_name ORDER BY player_log.predicted_time DESC)"
