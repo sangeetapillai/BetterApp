@@ -5,26 +5,43 @@ import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
+import org.springframework.util.StringUtils;
 
 import beans.PostResponse;
 import beans.User;
 import beans.UserResponse;
 import daos.UserDao;
+import utils.EmailUtility;
 import utils.StatusCode;
 
 public class AuthenticationService {
 	
 	private final UserDao userDao;
+	private final EmailUtility emailUtility;
 
-	public AuthenticationService(UserDao userDao) {
+	public AuthenticationService(UserDao userDao,EmailUtility emailUtility) {
 		super();
 		this.userDao = userDao;
+		this.emailUtility = emailUtility;
 	}
+	
+	public PostResponse verifyAndcreateUser(User newUser){
+		if(emailUtility.validateSecretCode(newUser.getUserEmail(), newUser.getCode())){
+			return createUser(newUser);
+		}
+		else{
+			return new PostResponse(StatusCode.FAILURE.getValue());
+		}
+	}
+	
 	public PostResponse createUser(User newUser){
 		
 		PostResponse bean = new PostResponse();
 		String tokenCode = this.getTokenCode();
 		String password = this.getEncryptedPassword(newUser.getUserPassword(), tokenCode);
+		if(StringUtils.isEmpty(newUser.getUserName())){
+			newUser.setUserName(newUser.getUserEmail());
+		}
 		if(userDao.createUser(newUser.getUserName(), newUser.getUserEmail(),password, tokenCode) == 1){
 			bean.setStatusCode(StatusCode.SUCCESS.getValue());
 		}
@@ -68,5 +85,16 @@ public class AuthenticationService {
 		StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
 		encryptor.setPassword(tokenCode);
 		return encryptor.decrypt(password);
+	}
+	
+	public PostResponse sendActivationLink(String userEmail){
+		PostResponse res = new PostResponse();
+		res.setStatusCode(StatusCode.FAILURE.getValue());
+		if(emailUtility.sendEmail(userEmail))
+		{
+			res.setStatusCode(StatusCode.SUCCESS.getValue());			
+			
+		}	
+		return res;
 	}
 }

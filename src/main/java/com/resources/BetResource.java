@@ -99,6 +99,41 @@ public class BetResource{
         return betService.getAllPredictionsForMatch(matchId);
     }
 	
+	@GET
+	@Path("/getOddsForMatch")
+	@Produces(MediaType.APPLICATION_JSON)
+	public PostResponse getOddsForMatch(@QueryParam("matchId") int matchId){
+		return betService.getOddsForMatch(matchId);
+	}
 	
+	@GET
+	@Path("/getMatchStatistics")
+	@Produces(MediaType.APPLICATION_JSON)
+	public PostResponse getMatchStatistics(){
+		return betService.getMatchStatisticsForFinishedMatches();
+	}
+	
+	@GET
+	@Path("/generateActivationLink")
+	@Produces(MediaType.APPLICATION_JSON)
+	public PostResponse generateActivationLink(@QueryParam("userEmail") String userEmail){
+		return authenticationService.sendActivationLink(userEmail);
+	}
+	
+	@POST
+	@Path("/resetPassword")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public PostResponse resetPassword(User user) {
+        return authenticationService.verifyAndcreateUser(user);
+    }
+	
+	@POST
+	@Path("/voteForChampion")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public PostResponse voteForChampion(Prediction prediction) {
+        return betService.voteForChampion(prediction);
+    }	
 	
 }

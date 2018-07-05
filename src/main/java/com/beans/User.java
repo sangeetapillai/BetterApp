@@ -13,7 +13,21 @@ public class User {
 	private int matchesNotPredicted;
 	private String prediction;
 	private String predictionTime;
+	private int rank;
+	private int code;
 	
+	public int getCode() {
+		return code;
+	}
+	public void setCode(int code) {
+		this.code = code;
+	}
+	public int getRank() {
+		return rank;
+	}
+	public void setRank(int rank) {
+		this.rank = rank;
+	}
 	public String getPredictionTime() {
 		return predictionTime;
 	}

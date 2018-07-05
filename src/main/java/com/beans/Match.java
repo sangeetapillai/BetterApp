@@ -18,7 +18,49 @@ public class Match {
 	private String winner;
 	private boolean voted;
 	private String votedFor;
+	private int numberOfBetForTeam1;
+	private int numberOfBetForTeam2;
+	private int numberOfBetForDraw;
+	private int totalWins;
+	private int totalBets;
+	private float winningBounty;
 	
+	public int getTotalWins() {
+		return totalWins;
+	}
+	public void setTotalWins(int totalWins) {
+		this.totalWins = totalWins;
+	}
+	public int getTotalBets() {
+		return totalBets;
+	}
+	public void setTotalBets(int totalBets) {
+		this.totalBets = totalBets;
+	}
+	public float getWinningBounty() {
+		return winningBounty;
+	}
+	public void setWinningBounty(float winningBounty) {
+		this.winningBounty = winningBounty;
+	}
+	public int getNumberOfBetForTeam1() {
+		return numberOfBetForTeam1;
+	}
+	public void setNumberOfBetForTeam1(int numberOfBetForTeam1) {
+		this.numberOfBetForTeam1 = numberOfBetForTeam1;
+	}
+	public int getNumberOfBetForTeam2() {
+		return numberOfBetForTeam2;
+	}
+	public void setNumberOfBetForTeam2(int numberOfBetForTeam2) {
+		this.numberOfBetForTeam2 = numberOfBetForTeam2;
+	}
+	public int getNumberOfBetForDraw() {
+		return numberOfBetForDraw;
+	}
+	public void setNumberOfBetForDraw(int numberOfBetForDraw) {
+		this.numberOfBetForDraw = numberOfBetForDraw;
+	}
 	public String getVotedFor() {
 		return votedFor;
 	}

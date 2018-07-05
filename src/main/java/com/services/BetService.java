@@ -21,6 +21,7 @@ public class BetService {
 		super();
 		this.matchDao = matchDao;
 		this.userDao = userDao;
+		
 	}
 	
 	public MatchResponse getAllUpcomingMatches(String userEmail) {
@@ -68,6 +69,15 @@ public class BetService {
 		return pr;
 	}
 	
+	public PostResponse voteForChampion(Prediction prediction){
+		PostResponse pr = new PostResponse();
+		pr.setStatusCode(StatusCode.FAILURE.getValue());		
+		if (userDao.voteForChampion(prediction)){
+			pr.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return pr;
+	}
+	
 	public MatchResponse getUserTrackRecord(String userEmail) {
 		MatchResponse res = new MatchResponse();
 		res.setStatusCode(StatusCode.FAILURE.getValue());
@@ -88,4 +98,29 @@ public class BetService {
 		}
 		return users;
 	}
+	
+	public PostResponse getOddsForMatch(int matchId){
+		MatchResponse res = new MatchResponse();
+		res.setStatusCode(StatusCode.FAILURE.getValue());
+		res.setMatches(matchDao.getMatchOdds(matchId));
+		if(res.getMatches() != null){
+			res.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return res;
+	}
+	
+	public PostResponse getMatchStatisticsForFinishedMatches(){
+		MatchResponse res = new MatchResponse();
+		res.setStatusCode(StatusCode.FAILURE.getValue());
+		res.setMatches(matchDao.getMatchStatisticsForFinishedMatches());
+		if(res.getMatches() != null){
+			res.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return res;
+	}
+	
+	
+	
+
+	
 }

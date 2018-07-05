@@ -1,12 +1,14 @@
 package beans;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
 public class PostResponse {
 	protected String message;
 	protected String statusCode;
 	
+	public PostResponse(String statusCode){
+		super();
+		this.statusCode = statusCode;
+	}
+	public PostResponse(){}
 	public String getMessage() {
 		return message;
 	}

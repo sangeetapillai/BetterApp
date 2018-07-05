@@ -26,6 +26,7 @@ public class UserDao {
 		super();
 		this.jdbcTemplate = jdbcTemplate;
 	}
+
 	
 	public int createUser(String userName, String userEmail, String userPassword , String tokenCode)
 	{
@@ -93,13 +94,16 @@ public class UserDao {
 				 + "group by 1,2 order by user_points desc";*/
 		
 		try{
-			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(queryForUserPoints);        
+			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(queryForUserPoints);
+			int index = 1;
 	        while (rowSet.next()) {
 	        	 User user = new User();
+	        	 user.setRank(index);
 		         user.setUserEmail(rowSet.getString("useremail"));
 		         user.setUserName(rowSet.getString("useremail"));
-		         user.setUserPoints(rowSet.getFloat("user_points"));
+		         user.setUserPoints(Math.round(rowSet.getFloat("user_points")));
 		         userList.add(user);
+		         index++;
 	        }
 	        }catch(DataAccessException exp){
 	        	LOGGER.error(queryForUserPoints);
@@ -141,7 +145,7 @@ public class UserDao {
 				user.setUserEmail(rowSet.getString("player_name"));
 				user.setMatchesWon(rowSet.getInt("wins"));
 				user.setMatchesLost(rowSet.getInt("loss"));
-				user.setUserPoints(rowSet.getFloat("total_bounty"));
+				user.setUserPoints(Math.round(rowSet.getFloat("total_bounty")));
 			}
 	        
 		}catch(DataAccessException exp){
@@ -182,7 +186,6 @@ public class UserDao {
 					@Override
 					public void setValues(PreparedStatement ps, int i) throws SQLException {
 						Prediction prediction = predictions[i];
-						//Customer customer = customers.get(i);
 						ps.setString(1, prediction.getUserEmail());
 						ps.setInt(2, prediction.getMatchId());
 						ps.setString(3, prediction.getPrediction());
@@ -228,6 +231,26 @@ public class UserDao {
 			ex.printStackTrace();
 		}
 		return userList;
+	}
+	
+	public boolean voteForChampion(Prediction prediction)
+	{
+		boolean voted = false;
+		try {
+			String voteForChampion = 
+					"insert into player_log values(?,100,?,CAST (? AS timestamp ))";			
+				jdbcTemplate.update(voteForChampion,prediction.getUserEmail(),prediction.getPrediction(),Calendar.getInstance().getTime().toString());
+				voted = true;
+		} catch (DataAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return voted;
+	
 	}
 	
 }

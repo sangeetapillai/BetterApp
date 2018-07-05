@@ -85,7 +85,7 @@ public class MatchDao {
 		List<Match> matchList = new ArrayList<Match>();
 		
 		String queryForMatches = "select team1,team2,result as match_result,match_time,predicted_result as result,winning_bounty as points_earned, winner "
-				+ " from player_view_v2 where LOWER(player_name) = ? ";
+				+ " from player_view_v2 where LOWER(player_name) = ? order by match_id desc";
 		
 		/*
 		String queryForMatches = "select gus.useremail,plv.match_time,plv.team1, plv.team2,plv.predicted_result,mtb.result as \"match_result\","
@@ -100,6 +100,7 @@ public class MatchDao {
 	             match.setTeam1Name(rowSet.getString("team1"));
 	             match.setTeam2Name(rowSet.getString("team2"));
 	             match.setWinner(rowSet.getString("match_result"));
+	             match.setVotedFor(rowSet.getString("result"));
 	             String matchTime = rowSet.getString("match_time");
 	             match.setMatchTime(matchTime);
 	             if( rowSet.getInt("winner") == 1){
@@ -113,6 +114,72 @@ public class MatchDao {
         }
         }catch(DataAccessException exp){
         	LOGGER.error(queryForMatches);
+        	LOGGER.error(exp);
+        	exp.printStackTrace();
+        	matchList = null;
+        }
+		return matchList;
+	}
+	
+	public List<Match> getMatchOdds(int matchId){
+		String oddsQuery = "select team1,team2,bet_draw,bet_team1,bet_team2 from match_bet_stats where match_id= ? ";
+		List<Match> matchList = new ArrayList<Match>();
+		Match match;
+		try {
+			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(oddsQuery,matchId);		
+			while(rowSet.next())
+			{
+				match = new Match();
+				match.setTeam1Name(rowSet.getString("team1"));
+				match.setTeam2Name(rowSet.getString("team2"));
+				match.setNumberOfBetForTeam1(rowSet.getInt("bet_team1"));
+				match.setNumberOfBetForTeam2(rowSet.getInt("bet_team2"));
+				match.setNumberOfBetForDraw(rowSet.getInt("bet_draw"));
+				matchList.add(match);
+			}
+		} catch (DataAccessException e) {
+			LOGGER.error(oddsQuery);
+        	LOGGER.error(e);
+        	e.printStackTrace();
+        	matchList = null;
+		} catch (Exception e) {
+			LOGGER.error(oddsQuery);
+        	LOGGER.error(e);
+        	e.printStackTrace();
+        	matchList = null;
+		}      
+        return matchList;	
+	}
+	
+	public List<Match> getMatchStatisticsForFinishedMatches(){
+		List<Match> matchList = new ArrayList<Match>();
+		String matchStatQuery = "select  match_id , match_time , result , match_bounty , team1,team2 , total_wins , bet_draw ,"
+				+ " bet_team1,bet_team2 , total_bet , winning_bounty from match_bet_stats where COALESCE(LENGTH(result::TEXT),0) != 0 order by match_id;";
+		try{
+			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(matchStatQuery);        
+	        while (rowSet.next()) {
+	        	 Match match = new Match();
+	             match.setMatchId(rowSet.getInt("match_id"));
+	             match.setMatchTime(rowSet.getString("match_time"));
+	             match.setWinner(rowSet.getString("result"));
+	             match.setBounty(rowSet.getLong("match_bounty"));
+	             match.setTeam1Name(rowSet.getString("team1"));
+	             match.setTeam2Name(rowSet.getString("team2"));
+	             match.setTotalWins(rowSet.getInt("total_wins"));
+	             match.setNumberOfBetForDraw(rowSet.getInt("bet_draw"));
+	             match.setNumberOfBetForTeam1(rowSet.getInt("bet_team1"));
+	             match.setNumberOfBetForTeam2(rowSet.getInt("bet_team2"));
+	             match.setTotalBets(rowSet.getInt("total_bet"));
+	             match.setWinningBounty(Math.round(rowSet.getFloat("winning_bounty")));
+	             matchList.add(match);
+        }
+        }catch(DataAccessException exp){
+        	LOGGER.error(matchStatQuery);
+        	LOGGER.error(exp);
+        	exp.printStackTrace();
+        	matchList = null;
+        }catch(Exception exp){
+        	LOGGER.error(matchStatQuery);
         	LOGGER.error(exp);
         	exp.printStackTrace();
         	matchList = null;

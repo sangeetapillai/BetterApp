@@ -14,11 +14,11 @@
   <bean id="pgDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" p:driverClassName="org.postgresql.Driver"
 		p:url="jdbc:postgresql://localhost:5432/gz_db" p:username="gz_user" p:password="gz_user_123" p:initialSize="0" p:maxActive="10" 
 		p:maxWait="-1" p:maxIdle="0" />
-		
+  <bean id="emailUtility" class="utils.EmailUtility"/>
   <bean id="betService" class="services.BetService" 
 		c:matchDao-ref="matchDao" c:userDao-ref="userDao"  />
   <bean id="AuthenticationService" class="services.AuthenticationService" 
-		c:userDao-ref="userDao" />
+		c:userDao-ref="userDao" c:emailUtility-ref="emailUtility" />
   <bean id="matchDao" class="daos.MatchDao" c:jdbcTemplate-ref="jdbcTemplate"/>
   <bean id="userDao" class="daos.UserDao" c:jdbcTemplate-ref="jdbcTemplate"/>	
 	
