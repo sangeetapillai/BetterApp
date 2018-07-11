@@ -134,6 +134,28 @@ public class BetResource{
     @Consumes(MediaType.APPLICATION_JSON)
     public PostResponse voteForChampion(Prediction prediction) {
         return betService.voteForChampion(prediction);
-    }	
+    }
+	
+	@GET
+	@Path("/getMatchStatisticsJackPot1")
+	@Produces(MediaType.APPLICATION_JSON)
+	public PostResponse getMatchStatisticsJackPot1(@QueryParam("matchId") int matchId){
+		return betService.getMatchStatisticsForJackpot1(matchId);
+	}
+	
+	@GET
+	@Path("/getOddsForJackpot1")
+	@Produces(MediaType.APPLICATION_JSON)
+	public PostResponse getOddsForJackpot1(@QueryParam("matchId") int matchId){
+		return betService.getOddsForJackpot1(matchId);
+	}
+	
+	@POST
+	@Path("/voteForChampion2")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public PostResponse voteForChampion2(Prediction prediction) {
+        return betService.voteForChampion2(prediction);
+    }
 	
 }

@@ -4,6 +4,20 @@ public class Prediction {
    int matchId;
    String userEmail;
    String prediction;
+   int jackpotBets;
+   int totalJackPotBets;
+	public int getJackpotBets() {
+	return jackpotBets;
+}
+public void setJackpotBets(int jackpotBets) {
+	this.jackpotBets = jackpotBets;
+}
+public int getTotalJackPotBets() {
+	return totalJackPotBets;
+}
+public void setTotalJackPotBets(int totalJackPotBets) {
+	this.totalJackPotBets = totalJackPotBets;
+}
 	public int getMatchId() {
 		return matchId;
 	}

@@ -7,6 +7,7 @@ import beans.Match;
 import beans.MatchResponse;
 import beans.PostResponse;
 import beans.Prediction;
+import beans.PredictionResponse;
 import beans.User;
 import beans.UserResponse;
 import daos.MatchDao;
@@ -78,6 +79,15 @@ public class BetService {
 		return pr;
 	}
 	
+	public PostResponse voteForChampion2(Prediction prediction){
+		PostResponse pr = new PostResponse();
+		pr.setStatusCode(StatusCode.FAILURE.getValue());		
+		if (userDao.voteForChampion2(prediction)){
+			pr.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return pr;
+	}
+	
 	public MatchResponse getUserTrackRecord(String userEmail) {
 		MatchResponse res = new MatchResponse();
 		res.setStatusCode(StatusCode.FAILURE.getValue());
@@ -109,11 +119,31 @@ public class BetService {
 		return res;
 	}
 	
+	public PostResponse getOddsForJackpot1(int matchId){
+		PredictionResponse res = new PredictionResponse();
+		res.setStatusCode(StatusCode.FAILURE.getValue());
+		res.setPredictions(matchDao.getMatchOddsForJackpot1(matchId));
+		if(res.getPredictions() != null){
+			res.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return res;
+	}
+	
 	public PostResponse getMatchStatisticsForFinishedMatches(){
 		MatchResponse res = new MatchResponse();
 		res.setStatusCode(StatusCode.FAILURE.getValue());
 		res.setMatches(matchDao.getMatchStatisticsForFinishedMatches());
 		if(res.getMatches() != null){
+			res.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return res;
+	}
+	
+	public PostResponse getMatchStatisticsForJackpot1(int matchId){
+		UserResponse res = new UserResponse();
+		res.setStatusCode(StatusCode.FAILURE.getValue());
+		res.setUsers(matchDao.getMatchStatisticsForJackpot1(matchId));
+		if(res.getUsers() != null){
 			res.setStatusCode(StatusCode.SUCCESS.getValue());
 		}
 		return res;

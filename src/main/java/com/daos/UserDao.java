@@ -253,5 +253,25 @@ public class UserDao {
 	
 	}
 	
+	public boolean voteForChampion2(Prediction prediction)
+	{
+		boolean voted = false;
+		try {
+			String voteForChampion = 
+					"insert into player_log values(?,101,?,CAST (? AS timestamp ))";			
+				jdbcTemplate.update(voteForChampion,prediction.getUserEmail(),prediction.getPrediction(),Calendar.getInstance().getTime().toString());
+				voted = true;
+		} catch (DataAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return voted;
+	
+	}
+	
 }
 	

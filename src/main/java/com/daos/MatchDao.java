@@ -14,6 +14,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import beans.Match;
+import beans.Prediction;
+import beans.User;
 
 public class MatchDao {
 	
@@ -151,6 +153,33 @@ public class MatchDao {
         return matchList;	
 	}
 	
+	public List<Prediction> getMatchOddsForJackpot1(int matchId){
+		String oddsQuery = "select prediction , bets , total_bets from multi_match_bet_stats_v3 where match_id=? ";
+		List<Prediction> matchList = new ArrayList<Prediction>();
+		try {
+			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(oddsQuery,matchId);		
+			while(rowSet.next())
+			{
+				Prediction p = new Prediction();
+				p.setPrediction(rowSet.getString("prediction"));
+				p.setJackpotBets(rowSet.getInt("bets"));
+				p.setTotalJackPotBets(rowSet.getInt("total_bets"));
+				matchList.add(p);
+			}
+		} catch (DataAccessException e) {
+			LOGGER.error(oddsQuery);
+        	LOGGER.error(e);
+        	e.printStackTrace();
+        	matchList = null;
+		} catch (Exception e) {
+			LOGGER.error(oddsQuery);
+        	LOGGER.error(e);
+        	e.printStackTrace();
+        	matchList = null;
+		}      
+        return matchList;	
+	}
+	
 	public List<Match> getMatchStatisticsForFinishedMatches(){
 		List<Match> matchList = new ArrayList<Match>();
 		String matchStatQuery = "select  match_id , match_time , result , match_bounty , team1,team2 , total_wins , bet_draw ,"
@@ -185,6 +214,31 @@ public class MatchDao {
         	matchList = null;
         }
 		return matchList;
+	}
+	
+	public List<User> getMatchStatisticsForJackpot1(int matchId){
+		List<User> userList = new ArrayList<User>();
+		String matchStatQuery = "select player_name,predicted_result from single_player_view_v3 where match_id=?";
+		try{
+			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(matchStatQuery,matchId);        
+	        while (rowSet.next()) {
+	        	 User user = new User();
+	             user.setUserEmail(rowSet.getString("player_name"));
+	             user.setPrediction(rowSet.getString("predicted_result"));
+	             userList.add(user);
+        }
+        }catch(DataAccessException exp){
+        	LOGGER.error(matchStatQuery);
+        	LOGGER.error(exp);
+        	exp.printStackTrace();
+        	userList = null;
+        }catch(Exception exp){
+        	LOGGER.error(matchStatQuery);
+        	LOGGER.error(exp);
+        	exp.printStackTrace();
+        	userList = null;
+        }
+		return userList;
 	}
 	
 	public static void main (String args[]) throws ParseException  {
