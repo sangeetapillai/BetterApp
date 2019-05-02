@@ -13,8 +13,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class EmailUtility {
 
-	private static String userName = "betapp123@gmail.com";
-	private static String password = "rikdfliomxawcohs";
+	
+
+	private static String userName = "viq.betting@gmail.com";
+	private static String password = "csolapar";
 	private static String emailSubject = "Activation link";
 	private static String host = "smtp.gmail.com";
 	private static String port = "25";
@@ -28,7 +30,13 @@ public class EmailUtility {
 			props.put("mail.smtp.port",port);
 			props.put("mail.smtp.auth", "true");
 			props.put("mail.smtp.starttls.required", "true");
-			Session session = Session.getDefaultInstance(props, null);
+//			Session session = Session.getDefaultInstance(props, null);
+			Session session = Session.getDefaultInstance(props,    
+	                new javax.mail.Authenticator() {    
+	                protected PasswordAuthentication getPasswordAuthentication() {    
+	                return new PasswordAuthentication(userName,password);  
+	                }    
+	               });
 			// Create email message
 			MimeMessage message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(userName));
@@ -82,6 +90,7 @@ public class EmailUtility {
 	}
 	public static void main(String args[]){
 		EmailUtility e = new EmailUtility();
-		e.sendEmail("venkatarami.mannem@nielsen.com");
+		e.sendEmail("suma.nair@nielsen.com");
 	}
+
 }
