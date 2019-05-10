@@ -43,6 +43,7 @@ public class AuthenticationService {
 			newUser.setUserName(newUser.getUserEmail());
 		}
 		if(userDao.createUser(newUser.getUserName(), newUser.getUserEmail(),password, tokenCode) == 1){
+			sendActivationLink(newUser.getUserEmail());
 			bean.setStatusCode(StatusCode.SUCCESS.getValue());
 		}
 		else{
