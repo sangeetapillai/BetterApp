@@ -4,7 +4,7 @@
 
     <groupId>com.resources</groupId>
     <artifactId>betterapp</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>war</packaging>
 
     <name>BetterApp</name>
@@ -17,6 +17,11 @@
     </properties>
 
     <dependencies>
+    <dependency>
+	    <groupId>javax.mail</groupId>
+	    <artifactId>mail</artifactId>
+	    <version>1.4</version>
+	</dependency>    
 	<dependency>
 		    <groupId>net.bull.javamelody</groupId>
 		    <artifactId>javamelody-core</artifactId>
@@ -174,6 +179,7 @@
     </dependencies>
 
     <build>
+    	<finalName>betterapp</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

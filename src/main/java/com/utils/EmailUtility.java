@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -20,7 +21,7 @@ public class EmailUtility {
 	private static String emailSubject = "Activation link";
 	private static String host = "smtp.gmail.com";
 	private static String port = "25";
-	private static String appLink = "http://13.232.96.213/resetPassword";	
+	private static String appLink = "http://localhost:8080/betterapp/service/activateUser";	
 	public boolean sendEmail( String toEmailAddress) {            
 		boolean success = false;		
 		try {
@@ -28,6 +29,8 @@ public class EmailUtility {
 			props.put("mail.smtp.starttls.enable", "true");
 			props.put("mail.smtp.host", host);
 			props.put("mail.smtp.port",port);
+			props.put("mail.smtp.port", "587");
+			props.put("mail.smtp.socketFactory.port" , "587");
 			props.put("mail.smtp.auth", "true");
 			props.put("mail.smtp.starttls.required", "true");
 //			Session session = Session.getDefaultInstance(props, null);
@@ -52,7 +55,7 @@ public class EmailUtility {
 			message.setContent(getEmailContent(toEmailAddress), "text/html");
 			// Send smtp message
 			Transport tr = session.getTransport("smtp");
-			tr.connect(host, 25, userName, password);
+			tr.connect(host, 587, userName, password);
 			message.saveChanges();
 			tr.sendMessage(message, message.getAllRecipients());
 			tr.close();

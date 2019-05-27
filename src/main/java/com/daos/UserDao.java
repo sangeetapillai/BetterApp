@@ -57,9 +57,16 @@ public class UserDao {
 		
 	}
 	
+	public boolean activateUser(String userEmail){
+		String newUserQuery = 
+				"update gz_users set userstatus = 'Y' where lower(useremail) = ?";
+   		int entries = jdbcTemplate.update(newUserQuery,userEmail.toLowerCase());
+   		return (entries ==1)  ? true : false; 
+	}
+	
 	public User getUserWithEmail(String userEmail){
 		System.out.println("REQUEST REACHED");
-		String userQuery = "select userid,username,userpass,tokencode,useremail from gz_users where LOWER(useremail) = ?";
+		String userQuery = "select userid,username,userpass,tokencode,useremail from gz_users where userstatus = 'Y' and LOWER(useremail) = ?";
 		User user = new User();
 		user.setUserId(-1);
 		try{
@@ -85,13 +92,50 @@ public class UserDao {
 	
 	public List<User> getAllUserPointsInDesc(){
 		
-		List<User> userList = new ArrayList<User>();
-		String queryForUserPoints = "select player_name as useremail,user_points from single_player_view_v2 order by user_points desc";
+		List<User> userList = new ArrayList<User>();		
+		//String queryForUserPoints = "select player_name as useremail, total_bounty as user_points from final_fifa_2018_leaderboard	order by total_bounty desc";
 		
-	/*	String queryForUserPoints = 
-				"select gus.useremail,gus.username, sum(plv.bounty_won)  as \"user_points\" from player_view plv "
-				 + "join gz_users gus on gus.useremail = plv.useremail "
-				 + "group by 1,2 order by user_points desc";*/
+		String queryForUserPoints = 
+				"select plv.player_name,sum(case when plv.status='WON' then 1 else 0 end) as "+
+						"\"wins\",sum(case when plv.status='LOSE' then 1 else 0 end) as \"loss\" "+
+						",nlp.nill_play ,total_bounty from  player_view plv join (select plg.player_name,(select count(mtb.match_id) "+
+						"from match_table mtb where mtb.match_time<now())-count(distinct plg.match_id) as \"nill_play\" "+
+						"from player_log plg group by 1) nlp on nlp.player_name = plv.player_name group "+
+						"by plv.player_name,nlp.nill_play,total_bounty order by total_bounty";
+		
+		try{
+			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(queryForUserPoints);
+			int index = 1;
+	        while (rowSet.next()) {
+	        	 User user = new User();
+	        	 user.setRank(index);
+		         user.setUserEmail(rowSet.getString("player_name"));
+		         user.setUserName(rowSet.getString("player_name"));
+		         user.setUserPoints(Math.round(rowSet.getFloat("total_bounty")));
+		         user.setMatchesWon(rowSet.getInt("wins"));
+		         user.setMatchesLost(rowSet.getInt("loss"));
+		         userList.add(user);
+		         index++;
+	        }
+	        }catch(DataAccessException exp){
+	        	LOGGER.error(queryForUserPoints);
+	        	LOGGER.error(exp);
+	        	exp.printStackTrace();
+	        	userList = null;
+	       }catch(Exception exp){
+	        	LOGGER.error(queryForUserPoints);
+	        	LOGGER.error(exp);
+	        	exp.printStackTrace();
+	        	userList = null;
+	       }
+	
+		return userList;
+	}
+	
+public List<User> getAllUserPointsForJackpotInDesc(){
+		
+		List<User> userList = new ArrayList<User>();
+		String queryForUserPoints = "select player_name as useremail,sum(total_bounty) as user_points from single_player_view_v3 group by (player_name) order by user_points desc";
 		
 		try{
 			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(queryForUserPoints);
@@ -119,12 +163,11 @@ public class UserDao {
 	
 		return userList;
 	}
-	
 	public User getUserReportCard(String userEmail){
 		User user = new User();
-	
+		
 		String reportCardQuery = 
-				"select p.player_name,p.wins,p.loss,p.user_points as total_bounty  from single_player_view_v2 p where LOWER(p.player_name) = ?";
+				"select player_name,wins,loss,total_bounty from final_fifa_2018_leaderboard where LOWER(player_name) = ?";
 		
 		/*String reportCardQuery = 
 				"select p.player_name,p.wins,p.loss,p.nill_play,p.total_bounty from ("
@@ -147,6 +190,8 @@ public class UserDao {
 				user.setMatchesLost(rowSet.getInt("loss"));
 				user.setUserPoints(Math.round(rowSet.getFloat("total_bounty")));
 			}
+			
+			
 	        
 		}catch(DataAccessException exp){
 			System.out.println(reportCardQuery + userEmail);
@@ -253,13 +298,43 @@ public class UserDao {
 	
 	}
 	
+	public List<User> getAllUsers(){
+		String query = "select userid,username,useremail from gz_users where userstatus = 'Y'";		
+		List<User> userList = new ArrayList<User>();
+		try{
+			SqlRowSet rowSet  = jdbcTemplate.queryForRowSet(query);
+			while(rowSet.next()){
+				User user = new User();
+				user.setUserId(rowSet.getLong("userid"));
+				user.setUserName(rowSet.getString("username"));
+				user.setUserEmail(rowSet.getString("useremail"));
+				userList.add(user);
+			}
+	        
+		}catch(DataAccessException exp){
+			LOGGER.error(query);
+			LOGGER.error(exp);
+			userList = null;
+			exp.printStackTrace();
+		}catch (Exception ex){
+			LOGGER.error(ex);
+			userList=null;
+			ex.printStackTrace();
+		}
+		return userList;
+	}
+	
 	public boolean voteForChampion2(Prediction prediction)
 	{
 		boolean voted = false;
+		int matchId = 100;
+		if(prediction.getMatchId() > 0){
+			matchId = prediction.getMatchId();
+		}
 		try {
 			String voteForChampion = 
-					"insert into player_log values(?,101,?,CAST (? AS timestamp ))";			
-				jdbcTemplate.update(voteForChampion,prediction.getUserEmail(),prediction.getPrediction(),Calendar.getInstance().getTime().toString());
+					"insert into player_log(player_name,match_id,predicted_result,predicted_time) values(?,?,?,CAST (? AS timestamp ))";			
+				jdbcTemplate.update(voteForChampion,prediction.getUserEmail(),matchId,prediction.getPrediction(),Calendar.getInstance().getTime().toString());
 				voted = true;
 		} catch (DataAccessException e) {
 			// TODO Auto-generated catch block

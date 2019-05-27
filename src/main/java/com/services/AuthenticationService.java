@@ -34,6 +34,15 @@ public class AuthenticationService {
 		}
 	}
 	
+	public PostResponse verifyAndActivateUser(String email,int code){
+		if(emailUtility.validateSecretCode(email,code)){
+			return activateUser(email);
+		}
+		else{
+			return new PostResponse(StatusCode.FAILURE.getValue());
+		}
+	}
+	
 	public PostResponse createUser(User newUser){
 		
 		PostResponse bean = new PostResponse();
@@ -51,6 +60,17 @@ public class AuthenticationService {
 			bean.setMessage("User creation failed");
 		}
 		
+		return bean;
+	}
+	
+	public PostResponse activateUser(String email){
+		PostResponse bean = new PostResponse();
+		bean.setMessage("Activation failed");
+		bean.setStatusCode(StatusCode.FAILURE.getValue());
+		if(userDao.activateUser(email)){
+			bean.setMessage("Activattion success");
+			bean.setStatusCode(StatusCode.SUCCESS.getValue());
+		};
 		return bean;
 	}
 	

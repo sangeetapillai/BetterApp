@@ -15,7 +15,14 @@ public class User {
 	private String predictionTime;
 	private int rank;
 	private int code;
+	private String jackpotBounty;
 	
+	public String getJackpotBounty() {
+		return jackpotBounty;
+	}
+	public void setJackpotBounty(String jackpotBounty) {
+		this.jackpotBounty = jackpotBounty;
+	}
 	public int getCode() {
 		return code;
 	}

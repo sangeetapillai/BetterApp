@@ -5,13 +5,17 @@ import java.util.List;
 
 import beans.Match;
 import beans.MatchResponse;
+import beans.PlayerResponse;
 import beans.PostResponse;
 import beans.Prediction;
 import beans.PredictionResponse;
+import beans.Template;
+import beans.TemplateResponse;
 import beans.User;
 import beans.UserResponse;
 import daos.MatchDao;
 import daos.UserDao;
+import beans.Player;
 import utils.StatusCode;
 
 public class BetService {
@@ -25,8 +29,20 @@ public class BetService {
 		
 	}
 	
-	public MatchResponse getAllUpcomingMatches(String userEmail) {
-		List<Match> matchList =  matchDao.getAllUpcomingMatches(userEmail);
+	public TemplateResponse getAllTemplates(){
+		List<Template> templates = matchDao.getAllTemplates();
+		TemplateResponse response = new TemplateResponse();
+		response.setStatusCode(StatusCode.FAILURE.getValue());
+		response.setTemplateList(templates);
+		if(!templates.isEmpty()){
+			response.setStatusCode(StatusCode.SUCCESS.getValue());				
+		}
+		
+		return response;	
+		
+	}
+	public MatchResponse getAllUpcomingMatches(String userEmail,int templateId) {
+		List<Match> matchList =  matchDao.getAllUpcomingMatches(userEmail,templateId);
 		MatchResponse response = new MatchResponse();
 		response.setStatusCode(StatusCode.FAILURE.getValue());
 		response.setMatches(matchList);
@@ -39,6 +55,17 @@ public class BetService {
 	
 	public UserResponse getAllUserPointsInDesc() {
 		List<User> userList =  userDao.getAllUserPointsInDesc();
+		UserResponse response = new UserResponse();
+		response.setStatusCode(StatusCode.FAILURE.getValue());
+		response.setUsers(userList);
+		if(userList != null){
+			response.setStatusCode(StatusCode.SUCCESS.getValue());				
+		}		
+		return response;
+	}
+	
+	public UserResponse getAllJackpotUserPointsInDesc() {
+		List<User> userList =  userDao.getAllUserPointsForJackpotInDesc();
 		UserResponse response = new UserResponse();
 		response.setStatusCode(StatusCode.FAILURE.getValue());
 		response.setUsers(userList);
@@ -88,10 +115,10 @@ public class BetService {
 		return pr;
 	}
 	
-	public MatchResponse getUserTrackRecord(String userEmail) {
+	public MatchResponse getUserTrackRecord(String userEmail,int templateId) {
 		MatchResponse res = new MatchResponse();
 		res.setStatusCode(StatusCode.FAILURE.getValue());
-		res.setMatches(matchDao.getUserTrackRecord(userEmail));
+		res.setMatches(matchDao.getUserTrackRecord(userEmail,templateId));
 		if(res.getMatches() != null)
 		{
 			res.setStatusCode(StatusCode.SUCCESS.getValue());
@@ -129,10 +156,10 @@ public class BetService {
 		return res;
 	}
 	
-	public PostResponse getMatchStatisticsForFinishedMatches(){
+	public PostResponse getMatchStatisticsForFinishedMatches(int templateId){
 		MatchResponse res = new MatchResponse();
 		res.setStatusCode(StatusCode.FAILURE.getValue());
-		res.setMatches(matchDao.getMatchStatisticsForFinishedMatches());
+		res.setMatches(matchDao.getMatchStatisticsForFinishedMatches(templateId));
 		if(res.getMatches() != null){
 			res.setStatusCode(StatusCode.SUCCESS.getValue());
 		}
@@ -149,7 +176,42 @@ public class BetService {
 		return res;
 	}
 	
+	public PostResponse getPlayersForMatch(int matchId){
+		PlayerResponse res = new PlayerResponse();
+		res.setStatusCode(StatusCode.FAILURE.getValue());
+		res.setPlayers(matchDao.getPlayersForMatch(matchId));
+		if(res.getPlayers() != null){
+			res.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return res;
+	}
 	
+	public PostResponse getPlayersForMatchForUser(int matchId,String userEmail){
+		return matchDao.getPlayersForMatchForUser(matchId,userEmail);		
+	}
+	
+	public PostResponse setPlayersForMatchForUser(int matchId,String userEmail,PlayerResponse team){
+		PlayerResponse res = new PlayerResponse();
+		res.setStatusCode(StatusCode.FAILURE.getValue());
+		res.setPlayers(matchDao.setPlayersForMatchForUser(matchId,userEmail,team));
+		if(res.getPlayers() != null){
+			res.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return res;
+	}
+	
+	public PostResponse getAllUsers(){
+		UserResponse res = new UserResponse();
+		res.setStatusCode(StatusCode.FAILURE.getValue());
+		res.setUsers(userDao.getAllUsers());
+		if(res.getUsers() != null){
+			res.setStatusCode(StatusCode.SUCCESS.getValue());
+		}
+		return res;
+	}
+	
+	
+
 	
 
 	
